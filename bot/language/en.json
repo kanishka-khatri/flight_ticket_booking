@@ -1,0 +1,21 @@
+{
+    "welcome": "Welcome to Flight Booking Bot! How can I help you today?",
+    "ask_origin": "Where are you flying from? Please enter the city name.",
+    "ask_destination": "Where would you like to fly to? Please enter the city name.",
+    "ask_date": "When do you want to travel? Please enter the date (YYYY-MM-DD).",
+    "ask_travelers": "How many travelers?",
+    "flight_options": "Here are the available flights:",
+    "flight_details": "Flight %s by %s from %s to %s\nDeparture: %s\nArrival: %s\nDuration: %s\nPrice: ₹%s",
+    "filter_options": "You can filter by:\n1. Price\n2. Airline\n3. Layovers\n4. Travel duration\nPlease enter your choice:",
+    "book_confirm": "Would you like to book this flight? (yes/no)",
+    "ask_passenger_name": "Please enter passenger full name:",
+    "ask_email": "Please enter your email address:",
+    "ask_phone": "Please enter your phone number:",
+    "ask_payment": "Please select payment method:\n1. Credit Card\n2. Debit Card\n3. Net Banking",
+    "ask_card_details": "Please enter card number (16 digits):",
+    "ask_card_expiry": "Please enter card expiry (MM/YY):",
+    "ask_cvv": "Please enter CVV (3 digits):",
+    "booking_success": "Booking confirmed!\nBooking Reference: %s\nFlight: %s\nDeparture: %s\nPassengers: %d\nTotal Paid: ₹%s",
+    "error_general": "Sorry, something went wrong. Please try again.",
+    "error_no_flights": "No flights found for your criteria. Please try different dates or destinations."
+}

@@ -1,0 +1,27 @@
+{
+  "name": "flight_ticket_booking",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "botbuilder": "^4.23.2",
+    "botbuilder-dialogs": "^4.23.2",
+    "botframework-connector": "^4.21.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "i18n": "^0.15.1",
+    "mysql2": "^3.9.7"
+  },
+  "devDependencies": {
+    "botbuilder-testing": "^4.17.0-blobs1",
+    "chai": "^5.2.1",
+    "mocha": "^11.7.1",
+    "nodemon": "3.1.10"
+  }
+}
