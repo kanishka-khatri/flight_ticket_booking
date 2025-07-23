@@ -6,10 +6,11 @@ const {
     NumberPrompt,
     DialogSet,
     DialogTurnStatus,
-    CardFactory
+    
 } = require('botbuilder-dialogs');
 const flightService = require('../services/flightService');
 const pool = require('../../database/mysql-config');
+const { CardFactory } = require('botbuilder');
 const MAIN_MENU = 'mainMenu';
 const BOOK_FLIGHT = 'bookFlight';
 const SHOW_BOOKINGS = 'showBookings';
@@ -40,6 +41,113 @@ class MainDialog extends ComponentDialog {
         ]));
 
         this.initialDialogId = MAIN_MENU;
+    }
+
+    async showWelcomeStep(stepContext) {
+        // Skip welcome message if user directly asks for bookings
+        if (this.isBookingRequest(stepContext.context.activity.text)) {
+            return stepContext.beginDialog(SHOW_BOOKINGS);
+        }
+        
+        return stepContext.prompt('choicePrompt', {
+            prompt: 'Welcome to Flight Booking! ✈️ What would you like to do?',
+            choices: [
+                { value: 'book', action: { title: '📅 Book a flight' } },
+                { value: 'view', action: { title: '✈️ My bookings' } },
+                { value: 'help', action: { title: '❓ Help' } }
+            ],
+            style: 2
+        });
+    }
+
+    async processChoiceStep(stepContext) {
+    const choice = stepContext.result?.value?.toLowerCase() || '';
+
+    switch (choice) {
+        case 'book':
+            return stepContext.beginDialog(BOOK_FLIGHT);
+        case 'view':
+            return stepContext.beginDialog(SHOW_BOOKINGS);
+        case 'help':
+            return await this.showHelp(stepContext); // ✅ correctly awaited
+        default:
+            await stepContext.context.sendActivity('❌ Invalid choice. Please choose again.');
+            return stepContext.replaceDialog(MAIN_MENU);
+    }
+}
+
+    isBookingRequest(text) {
+        if (!text) return false;
+        const bookingKeywords = ['my booking', 'my bookings', 'show booking', 'show bookings'];
+        return bookingKeywords.some(keyword => 
+            text.toLowerCase().includes(keyword)
+        );
+    }
+
+    async showBookingsStep(stepContext) {
+        const userId = stepContext.context.activity.from.id;
+        const userName = stepContext.context.activity.from.name || 'Guest';
+        
+        try {
+            console.log(`Fetching bookings for user ${userId}`);
+            const bookings = await flightService.getUserBookings(userId);
+            
+            if (!bookings.length) {
+                await stepContext.context.sendActivity(
+                    `${userName}, you don't have any bookings yet.`
+                );
+                return stepContext.endDialog();
+            }
+            
+            // Create rich cards for each booking
+            const bookingCards = bookings.map(booking => ({
+                name: `FLT-${booking.id.toString().padStart(6, '0')}`,
+                value: {
+                    airline: booking.airline,
+                    route: `${booking.origin} → ${booking.destination}`,
+                    date: new Date(booking.departure).toLocaleDateString('en-GB'),
+                    passengers: booking.passengers,
+                    price: booking.total_price,
+                    status: booking.status,
+                    bookedOn: new Date(booking.booking_date).toLocaleDateString('en-GB')
+                }
+            }));
+
+            // Send a carousel of booking cards
+            await stepContext.context.sendActivity({
+                attachments: [this.createBookingsCarousel(bookingCards, userName)]
+            });
+            
+        } catch (error) {
+            console.error('Failed to fetch bookings:', error);
+            await stepContext.context.sendActivity(
+                '❌ Could not retrieve your bookings. Please try again later.'
+            );
+        }
+        
+        return stepContext.endDialog();
+    }
+
+    createBookingsCarousel(bookings, userName) {
+        return CardFactory.carousel(
+            bookings.map(booking => CardFactory.heroCard(
+                booking.name,
+                [
+                    `✈️ ${booking.value.airline} (${booking.value.route})`,
+                    `📅 ${booking.value.date}`,
+                    `👥 ${booking.value.passengers} passenger(s)`,
+                    `💰 $${booking.value.price}`,
+                    `🟢 ${booking.value.status}`,
+                    `Booked on: ${booking.value.bookedOn}`
+                ].join('\n'),
+                null,
+                [
+                    { type: 'imBack', title: 'Cancel Booking', value: `Cancel ${booking.name}` },
+                    { type: 'imBack', title: 'View Details', value: `Details ${booking.name}` }
+                ]
+            )),
+            `📋 ${userName}'s Bookings (${bookings.length})`
+        );
     }
 
     async showWelcomeStep(stepContext) {
