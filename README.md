@@ -12,15 +12,6 @@ This is an intelligent **Flight Ticket Booking Chatbot** built using the **Micro
 
 ---
 
-## 🚀 Features
-
-- ✅ Book a flight by providing origin, destination, date, and passenger details.
-- 📋 View existing flight bookings.
-- 💬 Interactive help using Hero Cards.
-- 🛢 MySQL integration for persistent flight and booking data.
-- 🧠 Conversational flow handled by Microsoft Bot Framework dialogs.
-
----
 
 ## 🔧 Technologies Used
 
